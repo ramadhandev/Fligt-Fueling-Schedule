@@ -19,13 +19,12 @@ class FlightImport extends Component
     public $isImporting = false;
     public $showManualForm = false;
 
-    // Manual input fields
+    // ✅ MANUAL INPUT FIELDS - HAPUS scheduled_arrival
     public $flight_number = '';
     public $airline_code = '';
     public $departure_airport = '';
     public $arrival_airport = '';
-    public $scheduled_departure = '';
-    public $scheduled_arrival = '';
+    public $scheduled_departure = ''; // HANYA STD
     public $cro_id = '';
     public $shift_id = '';
 
@@ -38,8 +37,7 @@ class FlightImport extends Component
         'airline_code' => 'required|string|max:3',
         'departure_airport' => 'required|string|max:3',
         'arrival_airport' => 'required|string|max:3',
-        'scheduled_departure' => 'required|date',
-        'scheduled_arrival' => 'required|date|after:scheduled_departure',
+        'scheduled_departure' => 'required|date', // ✅ HANYA STD
         'cro_id' => 'nullable|exists:users,id',
         'shift_id' => 'nullable|exists:shifts,id',
     ];
@@ -69,47 +67,47 @@ class FlightImport extends Component
         $this->csvFile = null;
     }
 
-   public function addManualFlight()
-{
-    $this->validate($this->manualRules);
+    public function addManualFlight()
+    {
+        $this->validate($this->manualRules);
 
-    try {
-        Log::info('Manual flight form data:', [
-            'flight_number' => $this->flight_number,
-            'airline_code' => $this->airline_code,
-            'departure_airport' => $this->departure_airport,
-            'arrival_airport' => $this->arrival_airport,
-            'scheduled_departure' => $this->scheduled_departure,
-            'scheduled_arrival' => $this->scheduled_arrival,
-            'cro_id' => $this->cro_id,
-            'shift_id' => $this->shift_id,
-        ]);
+        try {
+            Log::info('Manual flight form data:', [
+                'flight_number' => $this->flight_number,
+                'airline_code' => $this->airline_code,
+                'departure_airport' => $this->departure_airport,
+                'arrival_airport' => $this->arrival_airport,
+                'scheduled_departure' => $this->scheduled_departure, // ✅ HANYA STD
+                'cro_id' => $this->cro_id,
+                'shift_id' => $this->shift_id,
+            ]);
 
-        $importService = new FlightImportService();
-        $flightData = [[
-            'flight_number' => $this->flight_number,
-            'airline_code' => $this->airline_code,
-            'departure' => $this->departure_airport,
-            'arrival' => $this->arrival_airport,
-            'std' => $this->scheduled_departure,
-            'eta' => $this->scheduled_arrival,
-            'cro_id' => $this->cro_id ?: null,
-            'shift_id' => $this->shift_id ?: null,
-        ]];
-        
-        $importedFlights = $importService->importFromData($flightData);
-        
-        session()->flash('success', "Berhasil menambahkan flight {$this->flight_number}!");
-        
-        // Reset form
-        $this->resetManualForm();
-        
-    } catch (\Exception $e) {
-        Log::error('Error in addManualFlight: ' . $e->getMessage());
-        Log::error('Stack trace: ' . $e->getTraceAsString());
-        session()->flash('error', 'Error adding flight: ' . $e->getMessage());
+            $importService = new FlightImportService();
+            $flightData = [[
+                'flight_number' => $this->flight_number,
+                'airline_code' => $this->airline_code,
+                'departure' => $this->departure_airport,
+                'arrival' => $this->arrival_airport,
+                'std' => $this->scheduled_departure, // ✅ HANYA STD
+                // ❌ HAPUS ETA dari sini
+                'cro_id' => $this->cro_id ?: null,
+                'shift_id' => $this->shift_id ?: null,
+            ]];
+            
+            $importedFlights = $importService->importFromData($flightData);
+            
+            session()->flash('success', "Berhasil menambahkan flight {$this->flight_number}!");
+            
+            // Reset form
+            $this->resetManualForm();
+            
+        } catch (\Exception $e) {
+            Log::error('Error in addManualFlight: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            session()->flash('error', 'Error adding flight: ' . $e->getMessage());
+        }
     }
-}
+
     private function parseCSV($filePath)
     {
         $data = [];
@@ -119,14 +117,13 @@ class FlightImport extends Component
             $headers = fgetcsv($handle);
             
             while (($row = fgetcsv($handle)) !== FALSE) {
-                if (count($row) >= 6) {
+                if (count($row) >= 5) { // ✅ UBAH dari 6 ke 5 kolom
                     $data[] = [
                         'flight_number' => $row[0] ?? '',
                         'airline_code' => $row[1] ?? '',
                         'departure' => $row[2] ?? '',
                         'arrival' => $row[3] ?? '',
-                        'std' => $row[4] ?? '',
-                        'eta' => $row[5] ?? '',
+                        'std' => $row[4] ?? '', // ✅ HANYA STD, HAPUS ETA
                     ];
                 }
             }
@@ -144,8 +141,8 @@ class FlightImport extends Component
             'airline_code', 
             'departure_airport',
             'arrival_airport',
-            'scheduled_departure',
-            'scheduled_arrival',
+            'scheduled_departure', // ✅ HANYA STD
+            // ❌ HAPUS scheduled_arrival dari sini
             'cro_id',
             'shift_id',
         ]);

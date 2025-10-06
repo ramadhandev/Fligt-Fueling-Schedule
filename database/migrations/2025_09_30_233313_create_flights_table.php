@@ -9,13 +9,12 @@ return new class extends Migration
     public function up()
     {
         Schema::create('flights', function (Blueprint $table) {
-            $table->id(); // Ganti dari uuid() ke id()
+            $table->id();
             $table->string('flight_number');
             $table->string('airline_code');
             $table->string('departure_airport');
             $table->string('arrival_airport');
-            $table->dateTime('scheduled_departure');
-            $table->dateTime('scheduled_arrival');
+            $table->dateTime('scheduled_departure'); // STD untuk jadwal pengisian
             $table->string('status')->default('Scheduled');
             $table->foreignId('created_by')->constrained('users');
             $table->timestamps();

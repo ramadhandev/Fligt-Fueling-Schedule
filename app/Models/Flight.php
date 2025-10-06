@@ -16,18 +16,16 @@ class Flight extends Model
         'airline_code',
         'departure_airport',
         'arrival_airport',
-        'scheduled_departure',
-        'scheduled_arrival',
+        'scheduled_departure', // Hanya STD
         'status',
         'created_by',
     ];
 
     protected $casts = [
         'scheduled_departure' => 'datetime',
-        'scheduled_arrival' => 'datetime',
+        // HAPUS scheduled_arrival dari casts
     ];
 
-    // TAMBAH: Default values
     protected $attributes = [
         'status' => 'Scheduled',
     ];

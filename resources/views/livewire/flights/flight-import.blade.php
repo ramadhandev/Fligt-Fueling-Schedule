@@ -27,16 +27,16 @@
                     </div>
                 </form>
                 
-                <!-- CSV Format Info -->
+                <!-- ✅ CSV Format Info - UPDATE FORMAT -->
                 <div class="mt-6 p-4 bg-gray-50 rounded-md">
                     <h3 class="font-medium text-gray-900">Format CSV yang didukung:</h3>
                     <pre class="mt-2 text-sm text-gray-600">
-flight_number,airline_code,departure_airport,arrival_airport,scheduled_departure,scheduled_arrival
-GA-201,GAR,CGK,DPS,2025-09-27 08:00:00,2025-09-27 10:00:00
-JT-305,LNI,SUB,CGK,2025-09-27 09:30:00,2025-09-27 11:00:00
+flight_number,airline_code,departure_airport,arrival_airport,scheduled_departure
+GA-201,GAR,CGK,DPS,2025-09-27 08:00:00
+JT-305,LNI,SUB,CGK,2025-09-27 09:30:00
                     </pre>
                     <p class="text-sm text-gray-600 mt-2">
-                        <strong>Note:</strong> Untuk assign CRO dan Shift, gunakan form manual input di bawah.
+                        <strong>Note:</strong> Format CSV sekarang hanya 5 kolom (tanpa ETA). Untuk assign CRO dan Shift, gunakan form manual input di bawah.
                     </p>
                 </div>
             </div>
@@ -82,20 +82,16 @@ JT-305,LNI,SUB,CGK,2025-09-27 09:30:00,2025-09-27 11:00:00
                             @error('arrival_airport') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
                         
+                        <!-- ✅ HANYA STD SAJA -->
                         <div>
-                            <label for="scheduled_departure" class="block text-sm font-medium text-gray-700">STD</label>
+                            <label for="scheduled_departure" class="block text-sm font-medium text-gray-700">Scheduled Departure (STD)</label>
                             <input type="datetime-local" wire:model="scheduled_departure" id="scheduled_departure" 
                                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                             @error('scheduled_departure') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
                         
-                        <div>
-                            <label for="scheduled_arrival" class="block text-sm font-medium text-gray-700">ETA</label>
-                            <input type="datetime-local" wire:model="scheduled_arrival" id="scheduled_arrival" 
-                                   class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            @error('scheduled_arrival') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                        </div>
-
+                        <!-- ❌ HAPUS FIELD SCHEDULED ARRIVAL (ETA) -->
+                        
                         <!-- Field untuk pilih CRO -->
                         <div>
                             <label for="cro_id" class="block text-sm font-medium text-gray-700">Assign CRO (Optional)</label>
@@ -144,6 +140,7 @@ JT-305,LNI,SUB,CGK,2025-09-27 09:30:00,2025-09-27 11:00:00
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Flight</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Route</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">STD</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fueling Time</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CRO</th>
                             </tr>
@@ -161,6 +158,9 @@ JT-305,LNI,SUB,CGK,2025-09-27 09:30:00,2025-09-27 11:00:00
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {{ $flight->scheduled_departure->format('M j, H:i') }}
                                 </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ $flight->fuelSchedule->scheduled_fueling_time->format('M j, H:i') ?? '-' }}
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                         {{ $flight->status }}
@@ -172,7 +172,7 @@ JT-305,LNI,SUB,CGK,2025-09-27 09:30:00,2025-09-27 11:00:00
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+                                <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
                                     No flights imported yet.
                                 </td>
                             </tr>
